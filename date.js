@@ -1,11 +1,11 @@
+const options = { weekday: 'long', month: 'long', day: 'numeric' }
 exports.getDate = () =>{
     const today = new Date();
-    let options = { weekday: 'long', month: 'long', day: 'numeric' }
     return today.toLocaleDateString('en-us', options);
 }
 
+const options2 = { weekday: 'long'}
 exports.getDay = () =>{
     const today = new Date();
-    let options = { weekday: 'long'}
-    return today.toLocaleDateString('en-us', options);
+    return today.toLocaleDateString('en-us', options2);
 }
