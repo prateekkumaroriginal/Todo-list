@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const date = require(__dirname + '/date.js');
 const mongoose = require('mongoose');
-mongoose.connect("mongodb://127.0.0.1:27017/todoListDB").then(() => console.log('connected')).catch(e => console.log(e))
+mongoose.connect("mongodb://127.0.0.1:27017/todoListDB").then(() => console.log('connected')).catch(e => console.log(e));
 
 
 const app = express();
@@ -47,7 +47,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
-    
+
     if ((x = req.body.newItem) !== "") {
         const itemName = req.body.newItem;
         if (req.body.list === 'Work List') {
@@ -62,6 +62,13 @@ app.post("/", (req, res) => {
     } else {
         res.redirect("/");
     }
+});
+
+app.post("/delete", (req, res) => {
+    const itemId = req.body.checkbox;
+    Item.deleteOne({ _id: itemId }).then(() => {
+        res.redirect("/");
+    }).catch(e => console.log(e));
 });
 
 app.get("/work", (req, res) => {
