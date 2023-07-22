@@ -47,12 +47,16 @@ app.get("/", (req, res) => {
 });
 
 app.post("/", (req, res) => {
+    
     if ((x = req.body.newItem) !== "") {
+        const itemName = req.body.newItem;
         if (req.body.list === 'Work List') {
             workItems.push(x);
             res.redirect("/work");
         } else {
-            newListItems.push(x);
+            Item.create({
+                name: itemName
+            });
             res.redirect("/");
         }
     } else {
