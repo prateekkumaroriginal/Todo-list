@@ -28,11 +28,12 @@ h1{
     display: flex;
     align-items: center;
     border-bottom: 1px solid #f1f1f1;
+    overflow-wrap: anywhere;
 }
 
-/* .item:last-child{
-    border-bottom: 0;
-} */
+.item:last-of-type{
+    border-bottom: none;
+}
 
 input:checked+p{
     text-decoration: line-through 3px;

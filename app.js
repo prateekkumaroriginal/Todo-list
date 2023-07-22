@@ -2,8 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const date = require(__dirname + '/date.js');
 const mongoose = require('mongoose');
-mongoose.connect("mongodb://127.0.0.1:27017/todoListDB").then(()=>console.log('connected'))
-.catch(e=>console.log(e))
+mongoose.connect("mongodb://127.0.0.1:27017/todoListDB").then(() => console.log('connected')).catch(e => console.log(e))
 
 
 const app = express();
@@ -26,12 +25,25 @@ const Item = new mongoose.model('Item', itemSchema);
 //     { name: "<--Hit this to check" },
 // ]);
 
-const newListItems = ['Eat', 'Code', 'Sleep'];
 const workItems = [];
 
 app.get("/", (req, res) => {
     const day = date.getDate();
-    res.render("list", { listTitle: day, newListItems: newListItems });
+    Item.find({}).then(foundItems => {
+        if (foundItems.length === 0) {
+            Item.insertMany([
+                { name: "Welcome to your Todo List" },
+                { name: "Hit '+' button to add a new item" },
+                { name: "<--Hit this to check" },
+            ]).then(() => {
+                res.redirect("/");
+            }).catch((err) => {
+                console.log(err);
+            });
+        } else {
+            res.render("list", { listTitle: day, newListItems: foundItems });
+        }
+    })
 });
 
 app.post("/", (req, res) => {
