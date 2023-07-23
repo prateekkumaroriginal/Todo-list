@@ -8,7 +8,7 @@ mongoose.connect("mongodb://127.0.0.1:27017/todoListDB").then(() => console.log(
 const app = express();
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
 
 
 const itemSchema = mongoose.Schema({
@@ -19,23 +19,27 @@ const itemSchema = mongoose.Schema({
 });
 const Item = new mongoose.model('Item', itemSchema);
 
-// Item.insertMany([
-//     { name: "Welcome to your Todo List" },
-//     { name: "Hit '+' button to add a new item" },
-//     { name: "<--Hit this to check" },
-// ]);
+defaultItems = [
+    { name: "Welcome to your Todo List" },
+    { name: "Hit '+' button to add a new item" },
+    { name: "<--Hit this to check" },
+];
 
-const workItems = [];
+const listSchema = mongoose.Schema({
+    name: {
+        type: String,
+        required: true,
+    },
+    items: [itemSchema]
+});
+List = mongoose.model('List', listSchema);
+
 
 app.get("/", (req, res) => {
     const day = date.getDate();
     Item.find({}).then(foundItems => {
         if (foundItems.length === 0) {
-            Item.insertMany([
-                { name: "Welcome to your Todo List" },
-                { name: "Hit '+' button to add a new item" },
-                { name: "<--Hit this to check" },
-            ]).then(() => {
+            Item.insertMany(defaultItems).then(() => {
                 res.redirect("/");
             }).catch((err) => {
                 console.log(err);
@@ -50,18 +54,32 @@ app.post("/", (req, res) => {
 
     if ((x = req.body.newItem) !== "") {
         const itemName = req.body.newItem;
-        if (req.body.list === 'Work List') {
-            workItems.push(x);
-            res.redirect("/work");
-        } else {
-            Item.create({
-                name: itemName
-            });
-            res.redirect("/");
-        }
+        Item.create({
+            name: itemName
+        });
+        res.redirect("/");
     } else {
         res.redirect("/");
     }
+});
+
+app.get("/list/:customListName", (req, res) => {
+    customListName = req.params.customListName;
+
+    List.findOne({ name: customListName })
+        .then((foundList) => {
+            if (foundList) {
+                res.render("list", { listTitle: foundList.name, newListItems: foundList.items })
+            } else {
+                List.create({
+                    name: customListName,
+                    items: defaultItems,
+                });
+                res.redirect("/list/"+customListName);
+            }
+        })
+        .catch((e) => { console.log('Error: ' + e); })
+
 });
 
 app.post("/delete", (req, res) => {
@@ -71,9 +89,6 @@ app.post("/delete", (req, res) => {
     }).catch(e => console.log(e));
 });
 
-app.get("/work", (req, res) => {
-    res.render("list", { listTitle: "Work List", newListItems: workItems });
-});
 
 app.post("/work", (req, res) => {
     res.redirect("/work");
