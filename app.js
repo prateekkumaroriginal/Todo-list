@@ -36,7 +36,6 @@ List = mongoose.model('List', listSchema);
 
 
 app.get("/", (req, res) => {
-    const day = date.getDate();
     Item.find({}).then(foundItems => {
         if (foundItems.length === 0) {
             Item.insertMany(defaultItems).then(() => {
@@ -45,25 +44,32 @@ app.get("/", (req, res) => {
                 console.log(err);
             });
         } else {
-            res.render("list", { listTitle: day, newListItems: foundItems });
+            res.render("list", { listTitle: "Today", newListItems: foundItems });
         }
-    })
+    });
 });
 
 app.post("/", (req, res) => {
-
-    if ((x = req.body.newItem) !== "") {
-        const itemName = req.body.newItem;
-        Item.create({
+    const itemName = req.body.newItem;
+    const listName = req.body.list;
+    if (req.body.newItem !== "") {
+        const item = new Item({
             name: itemName
         });
-        res.redirect("/");
-    } else {
-        res.redirect("/");
+
+        if (listName == "Today") {
+            item.save();
+        } else {
+            List.findOne({ name: listName }).then((foundList) => {
+                foundList.items.push(item);
+                foundList.save();
+            }).catch((err) => { console.log(err); });
+        }
     }
+    res.redirect('back');
 });
 
-app.get("/list/:customListName", (req, res) => {
+app.get("/:customListName", (req, res) => {
     customListName = req.params.customListName;
 
     List.findOne({ name: customListName })
@@ -75,17 +81,17 @@ app.get("/list/:customListName", (req, res) => {
                     name: customListName,
                     items: defaultItems,
                 });
-                res.redirect("/list/"+customListName);
+                res.redirect("/" + customListName);
             }
         })
-        .catch((e) => { console.log('Error: ' + e); })
+        .catch((e) => { console.log('Error: ' + e); });
 
 });
 
 app.post("/delete", (req, res) => {
     const itemId = req.body.checkbox;
     Item.deleteOne({ _id: itemId }).then(() => {
-        res.redirect("/");
+        res.redirect("back");
     }).catch(e => console.log(e));
 });
 
