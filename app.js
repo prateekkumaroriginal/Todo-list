@@ -69,7 +69,7 @@ app.post("/", (req, res) => {
     res.redirect('back');
 });
 
-app.get("/:customListName", (req, res) => {
+app.get("/lists/:customListName", (req, res) => {
     customListName = req.params.customListName;
 
     List.findOne({ name: customListName })
@@ -81,7 +81,7 @@ app.get("/:customListName", (req, res) => {
                     name: customListName,
                     items: defaultItems,
                 });
-                res.redirect("/" + customListName);
+                res.redirect("/lists/" + customListName);
             }
         })
         .catch((e) => { console.log('Error: ' + e); });
@@ -93,11 +93,6 @@ app.post("/delete", (req, res) => {
     Item.deleteOne({ _id: itemId }).then(() => {
         res.redirect("back");
     }).catch(e => console.log(e));
-});
-
-
-app.post("/work", (req, res) => {
-    res.redirect("/work");
 });
 
 app.get("/about", (req, res) => {
