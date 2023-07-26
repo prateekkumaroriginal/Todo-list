@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const date = require(__dirname + '/date.js');
 const mongoose = require('mongoose');
+const _ = require('lodash');
+
 mongoose.connect("mongodb://127.0.0.1:27017/todoListDB").then(() => console.log('connected')).catch(e => console.log(e));
 
 
@@ -70,18 +72,19 @@ app.post("/", (req, res) => {
 });
 
 app.get("/lists/:customListName", (req, res) => {
-    customListName = req.params.customListName;
+    customListName = _.capitalize(req.params.customListName);
 
     List.findOne({ name: customListName })
         .then((foundList) => {
             if (foundList) {
-                res.render("list", { listTitle: foundList.name, newListItems: foundList.items })
+                res.render("list", { listTitle: foundList.name, newListItems: foundList.items });
             } else {
                 List.create({
                     name: customListName,
                     items: defaultItems,
+                }).then(()=>{
+                    res.redirect("/lists/" + customListName);
                 });
-                res.redirect("/lists/" + customListName);
             }
         })
         .catch((e) => { console.log('Error: ' + e); });
@@ -90,9 +93,17 @@ app.get("/lists/:customListName", (req, res) => {
 
 app.post("/delete", (req, res) => {
     const itemId = req.body.checkbox;
-    Item.deleteOne({ _id: itemId }).then(() => {
-        res.redirect("back");
-    }).catch(e => console.log(e));
+    const listName = req.body.listName;
+
+    if (listName === "Today") {
+        Item.deleteOne({ _id: itemId }).then(() => {
+            res.redirect("back");
+        }).catch(e => console.log(e));
+    } else {
+        List.findOneAndUpdate({ name: listName }, { $pull: { items: { _id: itemId } } }).then((foundList) => {
+            res.redirect("back");
+        }).catch((err) => { console.log(err); });
+    }
 });
 
 app.get("/about", (req, res) => {
