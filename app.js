@@ -46,7 +46,7 @@ app.get("/", (req, res) => {
                 console.log(err);
             });
         } else {
-            res.render("list", { listTitle: "Today", newListItems: foundItems });
+            res.render("list", { listTitle: "Today", ListItems: foundItems });
         }
     });
 });
@@ -77,14 +77,9 @@ app.get("/all-lists/:customListName", (req, res) => {
     List.findOne({ name: customListName })
         .then((foundList) => {
             if (foundList) {
-                res.render("list", { listTitle: foundList.name, newListItems: foundList.items });
-            } else {
-                List.create({
-                    name: customListName,
-                    items: defaultItems,
-                }).then(() => {
-                    res.redirect("/all-lists/" + customListName);
-                });
+                res.render("list", { listTitle: foundList.name, ListItems: foundList.items });
+            } else { // TODO Change this else clause to show 404 page bcoz '/create' is for creating new lists
+                res.render("404")
             }
         })
         .catch((e) => { console.log('Error: ' + e); });
@@ -111,10 +106,30 @@ app.get("/about", (req, res) => {
 });
 
 app.get("/all-lists", (req, res) => {
-    List.find({}).then((foundLists)=>{
-        res.render("all-lists", { pageTitle: "All Lists", foundLists:foundLists });
+    List.find({}).then((foundLists) => {
+        res.render("all-lists", { pageTitle: "All Lists", foundLists: foundLists });
     });
-})
+});
+
+app.get("/create", (req, res) => {
+    res.render("create", {});
+});
+
+app.post("/create", (req, res) => {
+    const newList = _.capitalize(req.body.newList);
+    List.findOne({ name: newList }).then((foundList) => {
+        if (foundList) {
+            console.log(`There is already a list named ${foundList.name}`);
+        } else {
+            List.create({
+                name: newList,
+                items: defaultItems,
+            }).then(() => {
+                res.redirect("/all-lists/" + newList);
+            });
+        }
+    })
+});
 
 app.listen(3000, () => {
     console.log("Server running on http://127.0.0.1:3000");
