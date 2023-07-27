@@ -71,7 +71,7 @@ app.post("/", (req, res) => {
     res.redirect('back');
 });
 
-app.get("/lists/:customListName", (req, res) => {
+app.get("/all-lists/:customListName", (req, res) => {
     customListName = _.capitalize(req.params.customListName);
 
     List.findOne({ name: customListName })
@@ -82,8 +82,8 @@ app.get("/lists/:customListName", (req, res) => {
                 List.create({
                     name: customListName,
                     items: defaultItems,
-                }).then(()=>{
-                    res.redirect("/lists/" + customListName);
+                }).then(() => {
+                    res.redirect("/all-lists/" + customListName);
                 });
             }
         })
@@ -109,6 +109,12 @@ app.post("/delete", (req, res) => {
 app.get("/about", (req, res) => {
     res.render("about", { listTitle: "About Me" });
 });
+
+app.get("/all-lists", (req, res) => {
+    List.find({}).then((foundLists)=>{
+        res.render("all-lists", { pageTitle: "All Lists", foundLists:foundLists });
+    });
+})
 
 app.listen(3000, () => {
     console.log("Server running on http://127.0.0.1:3000");

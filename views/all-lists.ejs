@@ -1,0 +1,17 @@
+<%- include('header', {pageTitle: pageTitle}) %>
+
+    <div class="box" id="heading">
+        <h1>All Lists</h1>
+    </div>
+
+    <div class="box">
+
+        <% foundLists.forEach(list=> { %>
+            <div class="item">
+                <p><a href="/all-lists/<%= list.name %>">
+                        <%= list.name %>
+                    </a>
+                </p>
+            </div>
+            <% }); %>
+    </div>
