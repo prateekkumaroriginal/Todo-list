@@ -5,4 +5,9 @@
             <input type="text" name="newList" placeholder="Enter List Name" autocomplete="off">
             <button type="submit" value="">+</button>
         </form>
+
+        <% if (listAlreadyExists){ %>
+            <p class="text-centre">List with name "<strong><%= listName %></strong>" already exists !</p>
+            <% } %>
+
     </div>

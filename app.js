@@ -78,7 +78,7 @@ app.get("/all-lists/:customListName", (req, res) => {
         .then((foundList) => {
             if (foundList) {
                 res.render("list", { listTitle: foundList.name, ListItems: foundList.items });
-            } else { // TODO Change this else clause to show 404 page bcoz '/create' is for creating new lists
+            } else {
                 res.render("404")
             }
         })
@@ -119,7 +119,7 @@ app.post("/create", (req, res) => {
     const newList = _.capitalize(req.body.newList);
     List.findOne({ name: newList }).then((foundList) => {
         if (foundList) {
-            console.log(`There is already a list named ${foundList.name}`);
+            res.render("create", {listAlreadyExists: true, listName: newList});
         } else {
             List.create({
                 name: newList,

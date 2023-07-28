@@ -136,3 +136,11 @@ a:focus {
     color: red;
     font-size: 2rem;
 }
+
+button:hover{
+    cursor: pointer;
+}
+
+.text-centre{
+    text-align: center;
+}
