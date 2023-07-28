@@ -7,11 +7,15 @@
     <div class="box">
 
         <% foundLists.forEach(list=> { %>
-            <div class="item">
-                <p><a href="/all-lists/<%= list.name %>">
+            <form action="/deleteList" method="post" class="item">
+                <p class="listName-para"><a href="/all-lists/<%= list.name %>">
                         <%= list.name %>
                     </a>
                 </p>
-            </div>
+
+                <button type="submit" name="listId" value="<%= list._id %>" class="del-btn"><img src="/css/delete.svg" height="32px" alt="D"></button>
+            </form>
             <% }); %>
     </div>
+
+    <%- include('footer') %>

@@ -101,6 +101,15 @@ app.post("/delete", (req, res) => {
     }
 });
 
+app.post("/deleteList", (req, res)=>{
+    const listId = req.body.listId;
+    List.deleteOne({_id: listId}).then((result)=>{
+        res.redirect("back");
+    }).catch((err)=>{
+        console.log(err);
+    })
+})
+
 app.get("/about", (req, res) => {
     res.render("about", { listTitle: "About Me" });
 });
@@ -112,7 +121,7 @@ app.get("/all-lists", (req, res) => {
 });
 
 app.get("/create", (req, res) => {
-    res.render("create", {});
+    res.render("create", {listAlreadyExists: false});
 });
 
 app.post("/create", (req, res) => {
