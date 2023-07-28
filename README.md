@@ -1,5 +1,5 @@
 # Todo-list
-A very simple classic Todo List App.
+A Todo List app where you can add new items and delete them. You can also create custom lists.
 
 # Tech Stack
 - Node.js
